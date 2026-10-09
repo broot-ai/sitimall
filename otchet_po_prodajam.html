@@ -2,8 +2,18 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Отчёт</title>
+
+  <!-- ==== PWA / Иконки ==== -->
+  <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Отчёт","short_name":"Отчёт","start_url":".","display":"standalone","background_color":"%23eef2f9","theme_color":"%232563eb","icons":[{"src":"https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any"}]}'>
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Отчёт">
+
   <style>
     * { box-sizing: border-box; }
 
@@ -17,18 +27,19 @@
       --accent-hover: #1d4ed8;
       --danger: #dc2626;
       --success: #059669;
-      --radius: 14px;
+      --radius: 30px;
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
       --tabs-height: 72px;
       --input-width: 180px;
+      --action-bar-height: 130px;
     }
 
     html, body { height: 100%; }
 
     body {
       margin: 0;
-      padding: calc(var(--tabs-height) + 20px) 16px 32px;
+      padding: calc(var(--tabs-height) + 20px) 16px calc(var(--action-bar-height) + 20px);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background:
         radial-gradient(1200px 600px at 50% -20%, #dbeafe 0%, transparent 60%),
@@ -38,7 +49,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* --- Экран блокировки --- */
+    /* ============ Экран блокировки (без фона карточки) ============ */
 
     .lock-screen {
       position: fixed;
@@ -47,7 +58,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 20px 20px 140px;
       background:
         radial-gradient(1200px 600px at 50% -20%, #dbeafe 0%, transparent 60%),
         var(--bg);
@@ -58,35 +69,48 @@
     .lock-card {
       width: 100%;
       max-width: 360px;
-      padding: 28px 24px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
       text-align: center;
+      /* Фон и рамка убраны */
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .lock-logo {
+      display: block;
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 16px;
+      object-fit: contain;
+      border-radius: 30px;
+      filter: drop-shadow(0 8px 20px rgba(37, 99, 235, 0.25));
     }
 
     .lock-card h1 {
       margin: 0 0 6px;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
+      font-weight: 800;
     }
 
     .lock-card p {
-      margin: 0 0 18px;
+      margin: 0 0 22px;
       color: var(--muted);
       font-size: .9rem;
+      font-weight: 600;
     }
 
     .lock-card input {
       width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      padding: 16px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
       font: inherit;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       text-align: center;
-      letter-spacing: 4px;
-      background: #f8fafc;
+      letter-spacing: 6px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       transition: border-color .15s, box-shadow .15s, background .15s;
     }
 
@@ -94,27 +118,8 @@
       outline: none;
       background: #fff;
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
     }
-
-    .lock-card button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 14px 18px;
-      border: 0;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #2563eb, #1e40af);
-      color: #fff;
-      font: inherit;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-      transition: transform .06s, box-shadow .2s;
-    }
-
-    .lock-card button:hover { box-shadow: 0 14px 30px rgba(37, 99, 235, 0.45); }
-    .lock-card button:active { transform: translateY(1px); }
 
     .lock-error {
       min-height: 1.2em;
@@ -124,7 +129,158 @@
       font-weight: 600;
     }
 
-    /* --- Фиксированные вкладки --- */
+    /* ============ Слайдер «Отдел открыт» ============ */
+
+    .slide-bottom {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;                 /* отступ от низа 30px */
+      width: calc(100% - 40px);
+      max-width: 420px;
+      z-index: 1001;
+    }
+
+    /* Выбор отдела */
+    .slide-departments {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .slide-departments label {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 8px;
+      border-radius: 24px;
+      background: transparent;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .2px;
+      cursor: pointer;
+      transition: background .15s, color .15s, box-shadow .15s;
+      text-align: center;
+      user-select: none;
+    }
+
+    .slide-departments input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slide-departments label:has(input:checked) {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .slide-caption {
+      margin: 0 0 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+
+    .slide-track {
+      position: relative;
+      height: 62px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.18);
+      touch-action: none;
+    }
+
+    .slide-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 62px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 30px;
+      transition: width .06s linear;
+      pointer-events: none;
+    }
+
+    .slide-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .5px;
+      pointer-events: none;
+      transition: color .2s;
+      padding-left: 62px;
+      padding-right: 62px;
+      text-align: center;
+    }
+
+    .slide-track.dragging .slide-text,
+    .slide-track.completed .slide-text {
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+    }
+
+    .slide-handle {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      bottom: 4px;
+      width: 54px;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #059669;
+      cursor: grab;
+      touch-action: none;
+      transition: transform .06s linear;
+      will-change: transform;
+    }
+
+    .slide-handle svg {
+      width: 26px;
+      height: 26px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .slide-handle:active { cursor: grabbing; }
+
+    .slide-track:not(.dragging):not(.completed) .slide-handle {
+      animation: slide-hint 1.8s ease-in-out infinite;
+    }
+
+    @keyframes slide-hint {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(10px); }
+    }
+
+    /* ============ Вкладки ============ */
 
     .tabs {
       position: fixed;
@@ -147,7 +303,7 @@
       flex: 1;
       padding: 12px 16px;
       border: 1px solid transparent;
-      border-radius: 12px;
+      border-radius: 30px;
       background: #f1f5f9;
       color: var(--muted);
       font: inherit;
@@ -164,7 +320,7 @@
     }
     .tabs button:active { transform: translateY(1px); }
 
-    /* --- Контент --- */
+    /* ============ Контент ============ */
 
     .report { max-width: 760px; margin: 0 auto; }
 
@@ -180,20 +336,67 @@
       margin: 0 0 18px;
       padding: 22px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 30px;
       background: var(--card);
       box-shadow: var(--shadow);
     }
 
     .section legend {
-      padding: 0 10px;
+      padding: 0 12px;
       font-size: 1.05rem;
       font-weight: 700;
       letter-spacing: .2px;
       color: var(--text);
     }
 
-    /* Строка: подпись слева, поле справа */
+    /* ============ Красная пометка ============ */
+
+    .warning-banner {
+      max-width: 760px;
+      margin: 0 auto 18px;
+      padding: 14px 18px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border: 1.5px solid #ef4444;
+      color: #b91c1c;
+      font-size: .95rem;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 8px 22px rgba(220, 38, 38, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .warning-banner::before {
+      content: "⚠";
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    /* ============ Фиксированная панель с кнопкой внизу ============ */
+
+    .section.action-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 20px;
+      width: calc(100% - 32px);
+      max-width: 760px;
+      margin: 0;
+      padding: 14px 18px 10px;
+      z-index: 90;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      box-shadow: 0 -6px 30px rgba(15, 23, 42, 0.14), var(--shadow);
+    }
+
+    /* ============ Строка: подпись слева, поле справа ============ */
+
     .row {
       display: flex;
       justify-content: space-between;
@@ -216,9 +419,9 @@
       flex: 0 0 var(--input-width);
       width: var(--input-width);
       max-width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      padding: 12px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
       font: inherit;
       font-size: 1rem;
       color: var(--text);
@@ -244,7 +447,7 @@
       border-color: #bfdbfe;
     }
 
-    /* --- Админ-панель --- */
+    /* ============ Админ-панель ============ */
 
     .admin-locked {
       display: flex;
@@ -256,13 +459,13 @@
     .admin-locked input {
       width: 100%;
       max-width: 240px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
       font: inherit;
       font-size: 1rem;
       text-align: center;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       background: #f8fafc;
       transition: border-color .15s, box-shadow .15s, background .15s;
     }
@@ -273,8 +476,6 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
-
-    .admin-locked .actions { width: 100%; }
 
     .admin-form { display: none; }
     .admin-form.visible { display: block; }
@@ -292,8 +493,8 @@
       justify-content: center;
       gap: 8px;
       padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
       background: #f8fafc;
       color: var(--muted);
       font-size: .95rem;
@@ -317,9 +518,9 @@
     .admin-textarea {
       width: 100%;
       min-height: 140px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      padding: 16px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
       font: inherit;
       font-size: 1rem;
       line-height: 1.45;
@@ -347,15 +548,15 @@
       letter-spacing: .3px;
     }
 
-    /* --- Кнопки --- */
+    /* ============ Кнопки ============ */
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
 
     .actions button {
       width: 100%;
-      padding: 14px 18px;
+      padding: 16px 20px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 30px;
       background: linear-gradient(135deg, #2563eb, #1e40af);
       color: #fff;
       font: inherit;
@@ -375,8 +576,8 @@
 
     .status {
       min-height: 1.3em;
-      margin-top: 12px;
-      font-size: .95rem;
+      margin-top: 8px;
+      font-size: .9rem;
       font-weight: 600;
       text-align: center;
     }
@@ -384,14 +585,20 @@
     .status.err { color: var(--danger); }
     .status.pending { color: var(--muted); }
 
-    /* --- Адаптив --- */
+    /* ============ Адаптив ============ */
 
     @media (max-width: 520px) {
-      body { padding: calc(var(--tabs-height) + 14px) 12px 24px; }
+      body { padding: calc(var(--tabs-height) + 14px) 12px calc(var(--action-bar-height) + 20px); }
       .tabs { padding: 10px 12px; }
       .section { padding: 18px; }
 
-      :root { --input-width: 150px; }
+      :root { --input-width: 150px; --action-bar-height: 120px; }
+
+      .section.action-bar {
+        width: calc(100% - 24px);
+        bottom: 20px;
+        padding: 12px 14px 8px;
+      }
 
       .row {
         flex-direction: row;
@@ -404,28 +611,68 @@
       .row input {
         flex: 0 0 var(--input-width);
         width: var(--input-width);
-        padding: 10px 12px;
+        padding: 10px 14px;
         font-size: .95rem;
       }
 
       .tabs button { padding: 10px 8px; font-size: .85rem; }
+
+      .slide-bottom { max-width: 100%; bottom: 30px; }
+
+      .slide-departments label { font-size: .8rem; padding: 8px 4px; }
+
+      .lock-logo { width: 84px; height: 84px; }
+
+      .warning-banner { font-size: .85rem; padding: 12px 14px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ==== ЭКРАН БЛОКИРОВКИ (общий пароль) ==== -->
+<!-- ============ ЭКРАН БЛОКИРОВКИ ============ -->
 <div class="lock-screen" id="lockScreen">
   <div class="lock-card">
+    <img class="lock-logo"
+         src="https://i.postimg.cc/j5VZ62Hn/i-OSTelegram-Ag-AD1Jw-AAtxd-IEs.png"
+         alt="Логотип">
     <h1>Вход</h1>
     <p>Введите пароль для доступа</p>
-    <input id="pagePassword" type="password" inputmode="numeric" autocomplete="off" placeholder="••••">
-    <button type="button" id="pageUnlockBtn">Войти</button>
+    <input id="pagePassword" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" maxlength="4">
     <div class="lock-error" id="pageLockError" role="alert"></div>
+  </div>
+
+  <!-- Слайдер «Отдел открыт» внизу -->
+  <div class="slide-bottom">
+    <div class="slide-departments" role="radiogroup" aria-label="Какой отдел открыт">
+      <label>
+        <input type="radio" name="openDept" value="machines">
+        Машинки
+      </label>
+      <label>
+        <input type="radio" name="openDept" value="vata">
+        Вата
+      </label>
+      <label>
+        <input type="radio" name="openDept" value="both" checked>
+        Оба
+      </label>
+    </div>
+
+    <p class="slide-caption" id="slideCaption">Сдвиньте, чтобы сообщить: Оба отдела — открыт</p>
+    <div class="slide-track" id="slideTrack">
+      <div class="slide-fill" id="slideFill"></div>
+      <div class="slide-text" id="slideLabel">Отдел открыт</div>
+      <div class="slide-handle" id="slideHandle" role="button" aria-label="Отдел открыт">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M5 12h12M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ==== ОСНОВНОЙ КОНТЕНТ ==== -->
+<!-- ============ ОСНОВНОЙ КОНТЕНТ ============ -->
 <div id="mainContent" style="display:none;">
 
 <nav class="tabs" role="tablist" aria-label="Разделы отчёта">
@@ -435,6 +682,11 @@
 </nav>
 
 <form id="reportForm" class="report" novalidate>
+
+  <!-- Красная пометка -->
+  <div class="warning-banner">
+    Если возникли проблемы с отправкой отчета — обращаться к Сайфулле
+  </div>
 
   <!-- ==== МАШИНКИ ==== -->
   <div class="panel active" id="panel-machines" role="tabpanel" aria-labelledby="tab-machines">
@@ -515,7 +767,7 @@
       </div>
     </fieldset>
 
-    <div class="section">
+    <div class="section action-bar">
       <div class="actions">
         <button type="button" id="generateMachines">Сформировать отчёт</button>
       </div>
@@ -549,7 +801,7 @@
       </div>
     </fieldset>
 
-    <div class="section">
+    <div class="section action-bar">
       <div class="actions">
         <button type="button" id="generateVata">Сформировать отчёт</button>
       </div>
@@ -562,17 +814,12 @@
     <fieldset class="section">
       <legend>Админ-панель</legend>
 
-      <!-- Форма ввода пароля админа -->
       <div class="admin-locked" id="adminLocked">
         <label for="adminPassword" style="text-align:center;">Введите пароль администратора</label>
-        <input id="adminPassword" type="password" inputmode="numeric" autocomplete="off" placeholder="••••">
-        <div class="actions">
-          <button type="button" id="adminUnlockBtn">Войти</button>
-        </div>
+        <input id="adminPassword" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" maxlength="4">
         <div class="lock-error" id="adminLockError" role="alert"></div>
       </div>
 
-      <!-- Форма ввода текста (после ввода пароля) -->
       <div class="admin-form" id="adminForm">
         <span class="admin-label">Куда отправить:</span>
         <div class="chat-choice">
@@ -608,33 +855,178 @@
   const PAGE_PASSWORD = '2244';
   const ADMIN_PASSWORD = '1972';
 
-  /* --- Блокировка страницы --- */
+  /* --- Telegram --- */
+  const TELEGRAM_URL = 'https://api.telegram.org/bot8989222195:AAGSigzk7XbStPSrxp9RhWwdfG3kqpdMj7Q/sendMessage';
+  const CHAT_ID_MACHINES = '-5081784447';
+  const CHAT_ID_VATA = '-5096610552';
+
+  async function sendToTelegram(chatId, text) {
+    const response = await fetch(TELEGRAM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text })
+    });
+    let data = null;
+    try { data = await response.json(); } catch (_) {}
+    if (!response.ok || !data || data.ok !== true) {
+      throw new Error((data && data.description) || `HTTP ${response.status}`);
+    }
+    return data;
+  }
+
+  /* ==================== СЛАЙДЕР «ОТДЕЛ ОТКРЫТ» ==================== */
+
+  const track = $('slideTrack');
+  const fill = $('slideFill');
+  const handle = $('slideHandle');
+  const label = $('slideLabel');
+  const slideCaption = $('slideCaption');
+
+  let dragging = false;
+  let startX = 0;
+  let maxX = 0;
+  let completed = false;
+
+  function getSelectedDept() {
+    const checked = document.querySelector('input[name="openDept"]:checked');
+    return checked ? checked.value : 'both';
+  }
+
+  function deptLabel(value) {
+    if (value === 'machines') return 'Машинки';
+    if (value === 'vata') return 'Вата';
+    return 'Оба отдела';
+  }
+
+  function getMaxX() {
+    return track.offsetWidth - handle.offsetWidth - 8;
+  }
+
+  function resetSlide() {
+    completed = false;
+    track.classList.remove('completed');
+    label.textContent = 'Отдел открыт';
+    handle.style.transition = 'transform .28s cubic-bezier(.2,.9,.3,1.2)';
+    fill.style.transition = 'width .28s cubic-bezier(.2,.9,.3,1.2)';
+    handle.style.transform = 'translateX(0)';
+    fill.style.width = handle.offsetWidth + 'px';
+    setTimeout(() => {
+      handle.style.transition = '';
+      fill.style.transition = '';
+    }, 300);
+  }
+
+  async function completeSlide() {
+    if (completed) return;
+    completed = true;
+    dragging = false;
+    track.classList.remove('dragging');
+    track.classList.add('completed');
+    maxX = getMaxX();
+
+    handle.style.transition = 'transform .15s ease-out';
+    fill.style.transition = 'width .15s ease-out';
+    handle.style.transform = `translateX(${maxX}px)`;
+    fill.style.width = '100%';
+
+    const dept = getSelectedDept();
+    const text = `Отдел открыт: ${deptLabel(dept)}`;
+
+    label.textContent = 'Отправка…';
+
+    try {
+      const tasks = [];
+      if (dept === 'machines' || dept === 'both') {
+        tasks.push(sendToTelegram(CHAT_ID_MACHINES, text));
+      }
+      if (dept === 'vata' || dept === 'both') {
+        tasks.push(sendToTelegram(CHAT_ID_VATA, text));
+      }
+      await Promise.all(tasks);
+      label.textContent = '✓ Отправлено';
+    } catch (e) {
+      label.textContent = 'Ошибка: ' + e.message;
+    }
+
+    setTimeout(resetSlide, 2000);
+  }
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (completed) return;
+    dragging = true;
+    startX = e.clientX;
+    maxX = getMaxX();
+    track.classList.add('dragging');
+    handle.setPointerCapture(e.pointerId);
+    handle.style.transition = 'none';
+    fill.style.transition = 'none';
+    e.preventDefault();
+  });
+
+  handle.addEventListener('pointermove', (e) => {
+    if (!dragging || completed) return;
+    const dx = Math.max(0, Math.min(maxX, e.clientX - startX));
+    handle.style.transform = `translateX(${dx}px)`;
+    fill.style.width = `${dx + handle.offsetWidth}px`;
+
+    if (dx >= maxX * 0.94) completeSlide();
+  });
+
+  handle.addEventListener('pointerup', (e) => {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('dragging');
+    try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+    if (!completed) resetSlide();
+  });
+
+  handle.addEventListener('pointercancel', () => {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('dragging');
+    if (!completed) resetSlide();
+  });
+
+  document.querySelectorAll('input[name="openDept"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      slideCaption.textContent = `Сдвиньте, чтобы сообщить: ${deptLabel(getSelectedDept())} — открыт`;
+    });
+  });
+
+  /* ==================== БЛОКИРОВКА СТРАНИЦЫ ==================== */
+
   const lockScreen = $('lockScreen');
   const mainContent = $('mainContent');
   const pagePasswordInput = $('pagePassword');
   const pageLockError = $('pageLockError');
 
   function tryUnlockPage() {
-    if (pagePasswordInput.value.trim() === PAGE_PASSWORD) {
+    const value = pagePasswordInput.value.trim();
+    if (value === PAGE_PASSWORD) {
       lockScreen.classList.add('hidden');
       mainContent.style.display = 'block';
       pageLockError.textContent = '';
-      // авто-установка времени после разблокировки
       refreshTimes();
-    } else {
+    } else if (value.length === 4) {
       pageLockError.textContent = 'Неверный пароль';
       pagePasswordInput.value = '';
       pagePasswordInput.focus();
     }
   }
 
-  $('pageUnlockBtn').addEventListener('click', tryUnlockPage);
+  pagePasswordInput.addEventListener('input', () => {
+    pagePasswordInput.value = pagePasswordInput.value.replace(/\D/g, '');
+    if (pagePasswordInput.value.length === 4) tryUnlockPage();
+  });
+
   pagePasswordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); tryUnlockPage(); }
   });
+
   pagePasswordInput.focus();
 
-  /* --- Вкладки --- */
+  /* ==================== ВКЛАДКИ ==================== */
+
   const tabs = document.querySelectorAll('.tabs button');
   const panels = {
     machines: $('panel-machines'),
@@ -662,10 +1054,6 @@
     vataTime: $('vataTime'), vataCash: $('vataCash'),
     vataCashless: $('vataCashless'), vataTotal: $('vataTotal')
   };
-
-  const TELEGRAM_URL = 'https://api.telegram.org/bot8739888147:AAH0LheLKlhmepc3dQwYg0zgn3SL5-fylZg/sendMessage';
-  const CHAT_ID_MACHINES = '-5081784447';
-  const CHAT_ID_VATA = '-5096610552';
 
   /* --- Время --- */
   function getCurrentTimeHHMM() {
@@ -715,21 +1103,6 @@
   const setMachinesStatus = makeStatusSetter($('statusMachines'));
   const setVataStatus = makeStatusSetter($('statusVata'));
   const setAdminStatus = makeStatusSetter($('statusAdmin'));
-
-  /* --- Telegram --- */
-  async function sendToTelegram(chatId, text) {
-    const response = await fetch(TELEGRAM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text })
-    });
-    let data = null;
-    try { data = await response.json(); } catch (_) {}
-    if (!response.ok || !data || data.ok !== true) {
-      throw new Error((data && data.description) || `HTTP ${response.status}`);
-    }
-    return data;
-  }
 
   /* --- Тексты отчётов --- */
   function buildMachinesText() {
@@ -816,19 +1189,24 @@
   const adminLockError = $('adminLockError');
 
   function tryUnlockAdmin() {
-    if (adminPasswordInput.value.trim() === ADMIN_PASSWORD) {
+    const value = adminPasswordInput.value.trim();
+    if (value === ADMIN_PASSWORD) {
       adminLocked.style.display = 'none';
       adminForm.classList.add('visible');
       adminLockError.textContent = '';
       $('adminText').focus();
-    } else {
+    } else if (value.length === 4) {
       adminLockError.textContent = 'Неверный пароль';
       adminPasswordInput.value = '';
       adminPasswordInput.focus();
     }
   }
 
-  $('adminUnlockBtn').addEventListener('click', tryUnlockAdmin);
+  adminPasswordInput.addEventListener('input', () => {
+    adminPasswordInput.value = adminPasswordInput.value.replace(/\D/g, '');
+    if (adminPasswordInput.value.length === 4) tryUnlockAdmin();
+  });
+
   adminPasswordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); tryUnlockAdmin(); }
   });
