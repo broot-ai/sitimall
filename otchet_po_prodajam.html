@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Отчёт</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #f5f7fb;
@@ -17,23 +15,70 @@
       --border: #d1d5db;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
+      --danger: #dc2626;
+      --success: #047857;
       --radius: 12px;
       --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --tabs-height: 64px;
     }
 
     body {
       margin: 0;
-      padding: 16px;
+      padding: calc(var(--tabs-height) + 16px) 16px 16px;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.45;
     }
 
-    .report {
-      max-width: 760px;
-      margin: 0 auto;
+    /* --- Фиксированные вкладки сверху --- */
+
+    .tabs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
     }
+
+    .tabs button {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .tabs button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* --- Контент --- */
+
+    .report { max-width: 760px; margin: 0 auto; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
 
     .section {
       margin: 0 0 16px;
@@ -48,7 +93,6 @@
       padding: 0 8px;
       font-size: 1.15rem;
       font-weight: 700;
-      color: var(--text);
     }
 
     .row {
@@ -59,14 +103,9 @@
       margin-bottom: 10px;
     }
 
-    .row:last-child {
-      margin-bottom: 0;
-    }
+    .row:last-child { margin-bottom: 0; }
 
-    label {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    label { color: var(--muted); font-size: 0.95rem; }
 
     input {
       width: 100%;
@@ -91,15 +130,10 @@
       cursor: default;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 0 0 12px;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 12px; }
 
-    button {
-      padding: 10px 16px;
+    .actions button {
+      padding: 12px 18px;
       border: 0;
       border-radius: 9px;
       background: var(--accent);
@@ -107,173 +141,198 @@
       font: inherit;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s, transform 0.05s;
+      transition: background 0.15s, transform 0.05s, opacity 0.15s;
     }
 
-    button:hover {
-      background: var(--accent-hover);
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button.secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    button.secondary:hover {
-      background: #d1d5db;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 240px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      resize: vertical;
-      font: 0.95rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      color: var(--text);
-      background: #fff;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
+    .actions button:hover:not(:disabled) { background: var(--accent-hover); }
+    .actions button:active:not(:disabled) { transform: translateY(1px); }
+    .actions button:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .status {
       min-height: 1.3em;
-      margin-top: 8px;
-      color: #047857;
-      font-size: 0.9rem;
+      margin-top: 4px;
+      font-size: 0.95rem;
     }
 
+    .status.ok { color: var(--success); }
+    .status.err { color: var(--danger); }
+    .status.pending { color: var(--muted); }
+
     .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
     }
 
     @media (max-width: 520px) {
-      body {
-        padding: 12px;
-      }
-
-      .section {
-        padding: 14px;
-      }
-
-      .row {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
+      body { padding: calc(var(--tabs-height) + 12px) 12px 12px; }
+      .tabs { padding: 8px 12px; }
+      .section { padding: 14px; }
+      .row { grid-template-columns: 1fr; gap: 6px; }
     }
   </style>
 </head>
 <body>
 
+<!-- Фиксированный раздел с вкладками -->
+<nav class="tabs" role="tablist" aria-label="Разделы отчёта">
+  <button type="button" role="tab" id="tab-machines" aria-controls="panel-machines" aria-selected="true" class="active" data-tab="machines">Машинки</button>
+  <button type="button" role="tab" id="tab-vata" aria-controls="panel-vata" aria-selected="false" data-tab="vata">Вата</button>
+</nav>
+
 <form id="reportForm" class="report" novalidate>
-  <fieldset class="section">
-    <legend>Основной отчёт</legend>
 
-    <div class="row">
-      <label for="time">На время:</label>
-      <input id="time" name="time" type="time" value="16:00" step="60">
+  <!-- ==== ПАНЕЛЬ: МАШИНКИ ==== -->
+  <div class="panel active" id="panel-machines" role="tabpanel" aria-labelledby="tab-machines">
+    <fieldset class="section">
+      <legend>Основной отчёт</legend>
+
+      <div class="row">
+        <label for="time">На время:</label>
+        <input id="time" name="time" type="time" step="60">
+      </div>
+
+      <div class="row">
+        <label for="cash">Нал:</label>
+        <input id="cash" name="cash" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="cashless">Б/н:</label>
+        <input id="cashless" name="cashless" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="promo">Прокатов акции:</label>
+        <input id="promo" name="promo" type="number" value="0" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="period">Откатались в период:</label>
+        <input id="period" name="period" type="number" value="0" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="clients">Клиентов общее:</label>
+        <input id="clients" name="clients" type="number" value="0" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="total">Итог:</label>
+        <input id="total" name="total" type="number" value="0" readonly>
+      </div>
+    </fieldset>
+
+    <fieldset class="section">
+      <legend>Тележки</legend>
+
+      <div class="row">
+        <label for="cartCash">Нал:</label>
+        <input id="cartCash" name="cartCash" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="cartCashless">Б/н:</label>
+        <input id="cartCashless" name="cartCashless" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="cartPeriod">Откатались в период:</label>
+        <input id="cartPeriod" name="cartPeriod" type="number" value="0" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="cartClients">Клиентов общее:</label>
+        <input id="cartClients" name="cartClients" type="number" value="0" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="cartTotal">Итог:</label>
+        <input id="cartTotal" name="cartTotal" type="number" value="0" readonly>
+      </div>
+    </fieldset>
+
+    <fieldset class="section">
+      <legend>Розыгрыш</legend>
+
+      <div class="row">
+        <label for="raffle">Розыгрыш:</label>
+        <input id="raffle" name="raffle" type="number" value="4" min="0" step="1" inputmode="numeric" data-zero-placeholder="true">
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" id="generateMachines">Сформировать отчёт</button>
     </div>
 
-    <div class="row">
-      <label for="cash">Нал:</label>
-      <input id="cash" name="cash" type="number" value="0" min="0" step="0.01" inputmode="decimal">
-    </div>
-
-    <div class="row">
-      <label for="cashless">Б/н:</label>
-      <input id="cashless" name="cashless" type="number" value="0" min="0" step="0.01" inputmode="decimal">
-    </div>
-
-    <div class="row">
-      <label for="promo">Прокатов акции:</label>
-      <input id="promo" name="promo" type="number" value="0" min="0" step="1" inputmode="numeric">
-    </div>
-
-    <div class="row">
-      <label for="period">Откатались в период:</label>
-      <input id="period" name="period" type="number" value="0" min="0" step="1" inputmode="numeric">
-    </div>
-
-    <div class="row">
-      <label for="clients">Клиентов общее:</label>
-      <input id="clients" name="clients" type="number" value="0" min="0" step="1" inputmode="numeric">
-    </div>
-
-    <div class="row">
-      <label for="total">Итог:</label>
-      <input id="total" name="total" type="number" value="0" readonly>
-    </div>
-  </fieldset>
-
-  <fieldset class="section">
-    <legend>Тележки</legend>
-
-    <div class="row">
-      <label for="cartCash">Нал:</label>
-      <input id="cartCash" name="cartCash" type="number" value="0" min="0" step="0.01" inputmode="decimal">
-    </div>
-
-    <div class="row">
-      <label for="cartCashless">Б/н:</label>
-      <input id="cartCashless" name="cartCashless" type="number" value="0" min="0" step="0.01" inputmode="decimal">
-    </div>
-
-    <div class="row">
-      <label for="cartPeriod">Откатались в период:</label>
-      <input id="cartPeriod" name="cartPeriod" type="number" value="0" min="0" step="1" inputmode="numeric">
-    </div>
-
-    <div class="row">
-      <label for="cartClients">Клиентов общее:</label>
-      <input id="cartClients" name="cartClients" type="number" value="0" min="0" step="1" inputmode="numeric">
-    </div>
-
-    <div class="row">
-      <label for="cartTotal">Итог:</label>
-      <input id="cartTotal" name="cartTotal" type="number" value="0" readonly>
-    </div>
-  </fieldset>
-
-  <fieldset class="section">
-    <legend>Розыгрыш</legend>
-
-    <div class="row">
-      <label for="raffle">Розыгрыш:</label>
-      <input id="raffle" name="raffle" type="number" value="4" min="0" step="1" inputmode="numeric">
-    </div>
-  </fieldset>
-
-  <div class="actions">
-    <button type="button" id="generateBtn">Сформировать отчёт</button>
-    <button type="button" id="copyBtn" class="secondary">Скопировать</button>
+    <div id="statusMachines" class="status" role="status" aria-live="polite"></div>
   </div>
 
-  <label class="sr-only" for="result">Результат отчёта</label>
-  <textarea id="result" readonly placeholder="Здесь появится отчёт"></textarea>
-  <div id="copyStatus" class="status" role="status" aria-live="polite"></div>
+  <!-- ==== ПАНЕЛЬ: ВАТА ==== -->
+  <div class="panel" id="panel-vata" role="tabpanel" aria-labelledby="tab-vata">
+    <fieldset class="section">
+      <legend>Вата</legend>
+
+      <div class="row">
+        <label for="vataTime">Время:</label>
+        <input id="vataTime" name="vataTime" type="time" step="60">
+      </div>
+
+      <div class="row">
+        <label for="vataCashless">Б/н:</label>
+        <input id="vataCashless" name="vataCashless" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="vataCash">Нал:</label>
+        <input id="vataCash" name="vataCash" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
+      </div>
+
+      <div class="row">
+        <label for="vataTotal">Итого:</label>
+        <input id="vataTotal" name="vataTotal" type="number" value="0" readonly>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" id="generateVata">Сформировать отчёт</button>
+    </div>
+
+    <div id="statusVata" class="status" role="status" aria-live="polite"></div>
+  </div>
+
 </form>
 
 <script>
   const $ = (id) => document.getElementById(id);
 
+  /* --- Вкладки --- */
+
+  const tabs = document.querySelectorAll('.tabs button');
+  const panels = {
+    machines: $('panel-machines'),
+    vata: $('panel-vata')
+  };
+
+  function activateTab(name) {
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.tab === name;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+
+    Object.entries(panels).forEach(([key, panel]) => {
+      panel.classList.toggle('active', key === name);
+    });
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => activateTab(tab.dataset.tab));
+  });
+
+  /* --- Поля --- */
+
   const fields = {
+    // Машинки
     time: $('time'),
     cash: $('cash'),
     cashless: $('cashless'),
@@ -287,24 +346,103 @@
     cartClients: $('cartClients'),
     cartTotal: $('cartTotal'),
     raffle: $('raffle'),
-    result: $('result'),
-    copyStatus: $('copyStatus')
+    // Вата
+    vataTime: $('vataTime'),
+    vataCash: $('vataCash'),
+    vataCashless: $('vataCashless'),
+    vataTotal: $('vataTotal')
   };
+
+  const TELEGRAM_URL = 'https://api.telegram.org/bot8739888147:AAH0LheLKlhmepc3dQwYg0zgn3SL5-fylZg/sendMessage';
+  const CHAT_ID = '-5376101736';
+
+  /* --- Автообновление времени --- */
+
+  function getCurrentTimeHHMM() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  function refreshTimes() {
+    [fields.time, fields.vataTime].forEach((input) => {
+      if (document.activeElement === input) return;
+      input.value = getCurrentTimeHHMM();
+    });
+  }
+
+  refreshTimes();
+  setInterval(refreshTimes, 30 * 1000);
+
+  /* --- Очистка нуля при фокусе --- */
+
+  document.querySelectorAll('input[data-zero-placeholder="true"]').forEach((input) => {
+    input.addEventListener('focus', () => {
+      if (input.value === '0' || input.value === '0.00') {
+        input.value = '';
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      if (input.value.trim() === '') {
+        input.value = '0';
+      }
+    });
+  });
+
+  /* --- Подсчёт итогов --- */
 
   function toNumber(value) {
     const number = Number(String(value).replace(',', '.'));
     return Number.isFinite(number) ? number : 0;
   }
 
-  function updateTotals() {
+  function updateMachinesTotals() {
     fields.total.value = toNumber(fields.cash.value) + toNumber(fields.cashless.value);
     fields.cartTotal.value = toNumber(fields.cartCash.value) + toNumber(fields.cartCashless.value);
   }
 
-  function generateReport() {
-    updateTotals();
+  function updateVataTotal() {
+    fields.vataTotal.value = toNumber(fields.vataCash.value) + toNumber(fields.vataCashless.value);
+  }
 
-    const report = [
+  /* --- Статусы --- */
+
+  function makeStatusSetter(el) {
+    return (message, kind) => {
+      el.textContent = message;
+      el.className = 'status' + (kind ? ' ' + kind : '');
+    };
+  }
+
+  const setMachinesStatus = makeStatusSetter($('statusMachines'));
+  const setVataStatus = makeStatusSetter($('statusVata'));
+
+  /* --- Отправка в Telegram --- */
+
+  async function sendToTelegram(text) {
+    const response = await fetch(TELEGRAM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text })
+    });
+
+    let data = null;
+    try { data = await response.json(); } catch (_) {}
+
+    if (!response.ok || !data || data.ok !== true) {
+      const description = (data && data.description) || `HTTP ${response.status}`;
+      throw new Error(description);
+    }
+
+    return data;
+  }
+
+  /* --- Формирование отчёта "Машинки" --- */
+
+  function buildMachinesText() {
+    return [
       'Основной отчёт',
       `На время: ${fields.time.value || '—'}`,
       `Нал: ${fields.cash.value || 0}`,
@@ -323,44 +461,76 @@
       '',
       `Розыгрыш: ${fields.raffle.value || 0}`
     ].join('\n');
-
-    fields.result.value = report;
   }
 
-  let statusTimer;
+  /* --- Формирование отчёта "Вата" --- */
 
-  function showStatus(message) {
-    fields.copyStatus.textContent = message;
-    clearTimeout(statusTimer);
-
-    statusTimer = setTimeout(() => {
-      fields.copyStatus.textContent = '';
-    }, 2000);
+  function buildVataText() {
+    return [
+      `время ${fields.vataTime.value || '—'}`,
+      `б/н:${fields.vataCashless.value || 0}`,
+      `нал:${fields.vataCash.value || 0}`,
+      `итого:${fields.vataTotal.value || 0}`
+    ].join('\n');
   }
 
-  async function copyReport() {
-    if (!fields.result.value.trim()) {
-      generateReport();
-    }
+  /* --- Обработчики кнопок --- */
+
+  async function handleGenerateMachines() {
+    fields.time.value = getCurrentTimeHHMM();
+    updateMachinesTotals();
+
+    const text = buildMachinesText();
+    const btn = $('generateMachines');
+
+    btn.disabled = true;
+    setMachinesStatus('Отправка отчёта…', 'pending');
 
     try {
-      await navigator.clipboard.writeText(fields.result.value);
-      showStatus('Скопировано');
+      await sendToTelegram(text);
+      setMachinesStatus('Отчёт отправлен', 'ok');
     } catch (error) {
-      fields.result.select();
-      document.execCommand('copy');
-      showStatus('Скопировано');
+      setMachinesStatus('Ошибка отправки: ' + error.message, 'err');
+    } finally {
+      btn.disabled = false;
     }
   }
 
-  $('generateBtn').addEventListener('click', generateReport);
-  $('copyBtn').addEventListener('click', copyReport);
+  async function handleGenerateVata() {
+    fields.vataTime.value = getCurrentTimeHHMM();
+    updateVataTotal();
+
+    const text = buildVataText();
+    const btn = $('generateVata');
+
+    btn.disabled = true;
+    setVataStatus('Отправка отчёта…', 'pending');
+
+    try {
+      await sendToTelegram(text);
+      setVataStatus('Отчёт отправлен', 'ok');
+    } catch (error) {
+      setVataStatus('Ошибка отправки: ' + error.message, 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  $('generateMachines').addEventListener('click', handleGenerateMachines);
+  $('generateVata').addEventListener('click', handleGenerateVata);
+
+  /* --- Реактивный подсчёт --- */
 
   ['cash', 'cashless', 'cartCash', 'cartCashless'].forEach((id) => {
-    $(id).addEventListener('input', updateTotals);
+    $(id).addEventListener('input', updateMachinesTotals);
   });
 
-  updateTotals();
+  ['vataCash', 'vataCashless'].forEach((id) => {
+    $(id).addEventListener('input', updateVataTotal);
+  });
+
+  updateMachinesTotals();
+  updateVataTotal();
 </script>
 
 </body>
