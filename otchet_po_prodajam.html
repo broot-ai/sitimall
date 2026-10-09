@@ -21,6 +21,7 @@
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
       --tabs-height: 72px;
+      --input-width: 180px;
     }
 
     html, body { height: 100%; }
@@ -106,34 +107,29 @@
       color: var(--text);
     }
 
-    /* Общая строка для "Машинок": подпись слева, поле справа */
+    /* Строка: подпись слева, поле справа */
     .row {
-      display: grid;
-      grid-template-columns: 1fr minmax(140px, 220px);
-      gap: 14px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
+      gap: 14px;
       margin-bottom: 12px;
     }
     .row:last-child { margin-bottom: 0; }
 
-    /* Строго вертикальная форма: подпись сверху, поле снизу */
-    .row-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-    .row-vertical:last-child { margin-bottom: 0; }
-
-    label {
+    .row label {
+      flex: 0 1 auto;
       color: var(--muted);
-      font-size: .9rem;
+      font-size: .95rem;
       font-weight: 600;
       letter-spacing: .3px;
+      min-width: 0;
     }
 
-    input {
-      width: 100%;
+    .row input {
+      flex: 0 0 var(--input-width);
+      width: var(--input-width);
+      max-width: 100%;
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -141,19 +137,20 @@
       font-size: 1rem;
       color: var(--text);
       background: #f8fafc;
+      text-align: right;
       transition: border-color .15s, box-shadow .15s, background .15s;
     }
 
-    input:hover { background: #fff; }
+    .row input:hover { background: #fff; }
 
-    input:focus {
+    .row input:focus {
       outline: none;
       background: #fff;
       border-color: var(--accent);
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
 
-    input[readonly] {
+    .row input[readonly] {
       background: #eff6ff;
       color: #1e3a8a;
       font-weight: 700;
@@ -198,11 +195,31 @@
     .status.err { color: var(--danger); }
     .status.pending { color: var(--muted); }
 
+    /* --- Адаптив --- */
+
     @media (max-width: 520px) {
       body { padding: calc(var(--tabs-height) + 14px) 12px 24px; }
       .tabs { padding: 10px 12px; }
       .section { padding: 18px; }
-      .row { grid-template-columns: 1fr; gap: 6px; }
+
+      :root { --input-width: 150px; }
+
+      .row {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .row label {
+        font-size: .9rem;
+      }
+
+      .row input {
+        flex: 0 0 var(--input-width);
+        width: var(--input-width);
+        padding: 10px 12px;
+        font-size: .95rem;
+      }
     }
   </style>
 </head>
@@ -307,22 +324,22 @@
     <fieldset class="section">
       <legend>Вата</legend>
 
-      <div class="row-vertical">
+      <div class="row">
         <label for="vataTime">Время</label>
         <input id="vataTime" name="vataTime" type="time" step="60">
       </div>
 
-      <div class="row-vertical">
+      <div class="row">
         <label for="vataCashless">Б/н</label>
         <input id="vataCashless" name="vataCashless" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
       </div>
 
-      <div class="row-vertical">
+      <div class="row">
         <label for="vataCash">Нал</label>
         <input id="vataCash" name="vataCash" type="number" value="0" min="0" step="0.01" inputmode="decimal" data-zero-placeholder="true">
       </div>
 
-      <div class="row-vertical">
+      <div class="row">
         <label for="vataTotal">Итого</label>
         <input id="vataTotal" name="vataTotal" type="number" value="0" readonly>
       </div>
