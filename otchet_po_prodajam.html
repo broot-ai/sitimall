@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <title>Отчёт</title>
 
-  <!-- ==== PWA / Иконки ==== -->
   <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg">
   <link rel="apple-touch-icon" href="https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg">
   <link rel="manifest" href='data:application/manifest+json,{"name":"Отчёт","short_name":"Отчёт","start_url":".","display":"standalone","background_color":"%23eef2f9","theme_color":"%232563eb","icons":[{"src":"https://i.postimg.cc/C1Dr9kh9/photo-5353081615665536369-y.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any"}]}'>
@@ -30,7 +29,7 @@
       --radius: 30px;
       --tabs-height: 72px;
       --input-width: 180px;
-      --action-bar-height: 130px;
+      --action-bar-height: 190px;
     }
 
     html, body { height: 100%; }
@@ -45,6 +44,7 @@
       color: var(--text);
       line-height: 1.45;
       -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
     }
 
     /* ============ Экран блокировки ============ */
@@ -102,16 +102,18 @@
       box-shadow: none;
     }
 
+    /* Логотип — без фона, без тени */
     .lock-logo {
       display: block;
-      width: 110px;
-      height: 110px;
+      width: 130px;
+      height: 130px;
       margin: 0 auto 18px;
       object-fit: contain;
       background: transparent;
       border: none;
       border-radius: 0;
-      filter: drop-shadow(0 10px 22px rgba(37, 99, 235, 0.22));
+      box-shadow: none;
+      filter: none;
     }
 
     .lock-card h1 {
@@ -133,11 +135,12 @@
       border: 1.5px solid var(--border);
       border-radius: 30px;
       font: inherit;
-      font-size: 1.15rem;
+      font-size: 16px; /* не меньше 16px — иначе iOS зумит */
       text-align: center;
       letter-spacing: 6px;
       background: #ffffff;
       transition: border-color .15s, box-shadow .15s, background .15s;
+      touch-action: manipulation;
     }
 
     .lock-card input:focus {
@@ -195,6 +198,7 @@
       transition: background .15s, color .15s;
       text-align: center;
       user-select: none;
+      touch-action: manipulation;
     }
 
     .slide-departments input[type="radio"] {
@@ -327,6 +331,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: background .18s, color .18s, transform .05s;
+      touch-action: manipulation;
     }
 
     .tabs button:hover { color: var(--accent); background: #eaf0fe; }
@@ -401,6 +406,7 @@
       min-width: 0;
     }
 
+    /* ВАЖНО: font-size 16px — иначе iOS Safari зумит при фокусе */
     .row input {
       flex: 0 0 var(--input-width);
       width: var(--input-width);
@@ -409,11 +415,12 @@
       border: 1.5px solid var(--border);
       border-radius: 30px;
       font: inherit;
-      font-size: 1rem;
+      font-size: 16px;
       color: var(--text);
       background: #f8fafc;
       text-align: right;
       transition: border-color .15s, background .15s;
+      touch-action: manipulation;
     }
 
     .row input:hover { background: #fff; }
@@ -432,7 +439,7 @@
       border-color: #bfdbfe;
     }
 
-    /* ============ Фото (появляется после 21:50) ============ */
+    /* ============ Фото (после 21:50) ============ */
 
     .photo-section { display: none; }
     .photo-section.visible { display: block; }
@@ -533,11 +540,12 @@
       border: 1.5px solid var(--border);
       border-radius: 30px;
       font: inherit;
-      font-size: 1rem;
+      font-size: 16px;
       text-align: center;
       letter-spacing: 4px;
       background: #f8fafc;
       transition: border-color .15s, background .15s;
+      touch-action: manipulation;
     }
 
     .admin-locked input:focus {
@@ -591,12 +599,13 @@
       border: 1.5px solid var(--border);
       border-radius: 30px;
       font: inherit;
-      font-size: 1rem;
+      font-size: 16px;
       line-height: 1.45;
       color: var(--text);
       background: #f8fafc;
       resize: vertical;
       transition: border-color .15s, background .15s;
+      touch-action: manipulation;
     }
 
     .admin-textarea:hover { background: #fff; }
@@ -634,6 +643,7 @@
       cursor: pointer;
       transition: transform .06s, opacity .2s;
       box-shadow: none;
+      touch-action: manipulation;
     }
 
     .actions button:active:not(:disabled) { transform: translateY(1px); }
@@ -657,7 +667,10 @@
       .tabs { padding: 10px 12px; }
       .section { padding: 18px; }
 
-      :root { --input-width: 150px; --action-bar-height: 120px; }
+      :root {
+        --input-width: 150px;
+        --action-bar-height: 180px;
+      }
 
       .section.action-bar {
         width: calc(100% - 24px);
@@ -673,11 +686,12 @@
 
       .row label { font-size: .9rem; }
 
+      /* font-size остаётся 16px — не уменьшаем, чтобы не было зума */
       .row input {
         flex: 0 0 var(--input-width);
         width: var(--input-width);
         padding: 10px 14px;
-        font-size: .95rem;
+        font-size: 16px;
       }
 
       .tabs button { padding: 10px 8px; font-size: .85rem; }
@@ -686,7 +700,7 @@
 
       .slide-departments label { font-size: .8rem; padding: 8px 4px; }
 
-      .lock-logo { width: 96px; height: 96px; }
+      .lock-logo { width: 115px; height: 115px; }
 
       .lock-warning { font-size: .85rem; padding: 12px 14px; top: 14px; }
 
@@ -705,6 +719,7 @@
 
   <div class="lock-card">
     <img class="lock-logo"
+         id="lockLogo"
          src="https://i.postimg.cc/j5VZ62Hn/i-OSTelegram-Ag-AD1Jw-AAtxd-IEs.png"
          alt="Логотип">
     <h1>Вход</h1>
@@ -852,6 +867,9 @@
       </div>
     </fieldset>
 
+    <!-- Отступ снизу, чтобы последний блок не уходил под фикс. панель -->
+    <div style="height: var(--action-bar-height);"></div>
+
     <div class="section action-bar">
       <div class="actions">
         <button type="button" id="generateMachines">Сформировать отчёт</button>
@@ -909,6 +927,8 @@
         <input id="vataTotal" name="vataTotal" type="number" value="0" readonly>
       </div>
     </fieldset>
+
+    <div style="height: var(--action-bar-height);"></div>
 
     <div class="section action-bar">
       <div class="actions">
@@ -971,6 +991,11 @@
   const CHAT_ID_MACHINES = '-5081784447';
   const CHAT_ID_VATA = '-5096610552';
 
+  /* --- Логотипы для экрана входа --- */
+  const LOGO_MACHINES = 'https://i.postimg.cc/pXT0fwNV/IMG-8689.png';
+  const LOGO_VATA = 'https://i.postimg.cc/3wK0pH6L/IMG-8690.png';
+  const LOGO_BOTH = 'https://i.postimg.cc/j5VZ62Hn/i-OSTelegram-Ag-AD1Jw-AAtxd-IEs.png';
+
   async function sendToTelegram(chatId, text) {
     const response = await fetch(TELEGRAM_URL, {
       method: 'POST',
@@ -1032,6 +1057,7 @@
   const handle = $('slideHandle');
   const label = $('slideLabel');
   const slideCaption = $('slideCaption');
+  const lockLogo = $('lockLogo');
 
   let dragging = false;
   let startX = 0;
@@ -1047,6 +1073,14 @@
     if (value === 'machines') return 'Машинки';
     if (value === 'vata') return 'Вата';
     return 'Оба отдела';
+  }
+
+  /* Меняем логотип на экране входа в зависимости от выбранного отдела */
+  function updateLockLogo() {
+    const dept = getSelectedDept();
+    if (dept === 'machines') lockLogo.src = LOGO_MACHINES;
+    else if (dept === 'vata') lockLogo.src = LOGO_VATA;
+    else lockLogo.src = LOGO_BOTH;
   }
 
   function getMaxX() {
@@ -1141,8 +1175,12 @@
   document.querySelectorAll('input[name="openDept"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       slideCaption.textContent = `Сдвиньте, чтобы сообщить: ${deptLabel(getSelectedDept())} — открыт`;
+      updateLockLogo();
     });
   });
+
+  // Инициализация логотипа при загрузке
+  updateLockLogo();
 
   /* ==================== БЛОКИРОВКА СТРАНИЦЫ ==================== */
 
@@ -1245,7 +1283,6 @@
     fields.cartTotal.value = toNumber(fields.cartCash.value) + toNumber(fields.cartCashless.value);
   }
   function updateVataTotal() {
-    // Итого = б/н + нал (стаканы не влияют на сумму)
     fields.vataTotal.value = toNumber(fields.vataCash.value) + toNumber(fields.vataCashless.value);
   }
 
@@ -1434,7 +1471,7 @@
 
   $('adminSendBtn').addEventListener('click', handleAdminSend);
 
-  /* --- Первичная проверка при загрузке --- */
+  /* --- Первичная проверка --- */
   updatePhotoVisibility();
 
 </script>
