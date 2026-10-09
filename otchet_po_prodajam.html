@@ -28,8 +28,6 @@
       --danger: #dc2626;
       --success: #059669;
       --radius: 30px;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
       --tabs-height: 72px;
       --input-width: 180px;
       --action-bar-height: 130px;
@@ -49,7 +47,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ============ Экран блокировки (без фона карточки) ============ */
+    /* ============ Экран блокировки ============ */
 
     .lock-screen {
       position: fixed;
@@ -58,7 +56,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px 20px 140px;
+      padding: 130px 20px 160px;
       background:
         radial-gradient(1200px 600px at 50% -20%, #dbeafe 0%, transparent 60%),
         var(--bg);
@@ -66,11 +64,39 @@
 
     .lock-screen.hidden { display: none; }
 
+    .lock-warning {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 420px;
+      z-index: 1002;
+      padding: 14px 18px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border: 1.5px solid #ef4444;
+      color: #b91c1c;
+      font-size: .9rem;
+      font-weight: 700;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      line-height: 1.35;
+    }
+
+    .lock-warning::before {
+      content: "⚠";
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
     .lock-card {
       width: 100%;
       max-width: 360px;
       text-align: center;
-      /* Фон и рамка убраны */
       background: transparent;
       border: none;
       box-shadow: none;
@@ -78,12 +104,14 @@
 
     .lock-logo {
       display: block;
-      width: 96px;
-      height: 96px;
-      margin: 0 auto 16px;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 18px;
       object-fit: contain;
-      border-radius: 30px;
-      filter: drop-shadow(0 8px 20px rgba(37, 99, 235, 0.25));
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      filter: drop-shadow(0 10px 22px rgba(37, 99, 235, 0.22));
     }
 
     .lock-card h1 {
@@ -108,9 +136,7 @@
       font-size: 1.15rem;
       text-align: center;
       letter-spacing: 6px;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: #ffffff;
       transition: border-color .15s, box-shadow .15s, background .15s;
     }
 
@@ -135,24 +161,20 @@
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      bottom: 30px;                 /* отступ от низа 30px */
+      bottom: 30px;
       width: calc(100% - 40px);
       max-width: 420px;
       z-index: 1001;
     }
 
-    /* Выбор отдела */
     .slide-departments {
       display: flex;
       gap: 8px;
       margin-bottom: 12px;
       padding: 6px;
-      background: rgba(255, 255, 255, 0.78);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 30px;
-      box-shadow: var(--shadow-sm);
     }
 
     .slide-departments label {
@@ -170,7 +192,7 @@
       font-weight: 700;
       letter-spacing: .2px;
       cursor: pointer;
-      transition: background .15s, color .15s, box-shadow .15s;
+      transition: background .15s, color .15s;
       text-align: center;
       user-select: none;
     }
@@ -184,7 +206,6 @@
     .slide-departments label:has(input:checked) {
       background: linear-gradient(135deg, #2563eb, #1e40af);
       color: #fff;
-      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
     }
 
     .slide-caption {
@@ -200,11 +221,10 @@
       position: relative;
       height: 62px;
       border-radius: 30px;
-      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      background: #cbd5e1;
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
-      box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.18);
       touch-action: none;
     }
 
@@ -240,7 +260,6 @@
     .slide-track.dragging .slide-text,
     .slide-track.completed .slide-text {
       color: #fff;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, .18);
     }
 
     .slide-handle {
@@ -251,7 +270,6 @@
       width: 54px;
       border-radius: 30px;
       background: #fff;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -260,6 +278,7 @@
       touch-action: none;
       transition: transform .06s linear;
       will-change: transform;
+      border: 1px solid var(--border);
     }
 
     .slide-handle svg {
@@ -293,9 +312,7 @@
       max-width: 760px;
       margin: 0 auto;
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: #ffffff;
       border-bottom: 1px solid var(--border);
     }
 
@@ -309,14 +326,13 @@
       font: inherit;
       font-weight: 600;
       cursor: pointer;
-      transition: background .18s, color .18s, box-shadow .18s, transform .05s;
+      transition: background .18s, color .18s, transform .05s;
     }
 
     .tabs button:hover { color: var(--accent); background: #eaf0fe; }
     .tabs button.active {
       background: linear-gradient(135deg, #2563eb, #1e40af);
       color: #fff;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
     }
     .tabs button:active { transform: translateY(1px); }
 
@@ -338,7 +354,6 @@
       border: 1px solid var(--border);
       border-radius: 30px;
       background: var(--card);
-      box-shadow: var(--shadow);
     }
 
     .section legend {
@@ -349,33 +364,7 @@
       color: var(--text);
     }
 
-    /* ============ Красная пометка ============ */
-
-    .warning-banner {
-      max-width: 760px;
-      margin: 0 auto 18px;
-      padding: 14px 18px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #fee2e2, #fecaca);
-      border: 1.5px solid #ef4444;
-      color: #b91c1c;
-      font-size: .95rem;
-      font-weight: 700;
-      text-align: center;
-      box-shadow: 0 8px 22px rgba(220, 38, 38, 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .warning-banner::before {
-      content: "⚠";
-      font-size: 1.15rem;
-      flex-shrink: 0;
-    }
-
-    /* ============ Фиксированная панель с кнопкой внизу ============ */
+    /* ============ Панель с кнопкой внизу ============ */
 
     .section.action-bar {
       position: fixed;
@@ -387,15 +376,12 @@
       margin: 0;
       padding: 14px 18px 10px;
       z-index: 90;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 30px;
-      box-shadow: 0 -6px 30px rgba(15, 23, 42, 0.14), var(--shadow);
     }
 
-    /* ============ Строка: подпись слева, поле справа ============ */
+    /* ============ Строка ============ */
 
     .row {
       display: flex;
@@ -427,7 +413,7 @@
       color: var(--text);
       background: #f8fafc;
       text-align: right;
-      transition: border-color .15s, box-shadow .15s, background .15s;
+      transition: border-color .15s, background .15s;
     }
 
     .row input:hover { background: #fff; }
@@ -436,7 +422,6 @@
       outline: none;
       background: #fff;
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
 
     .row input[readonly] {
@@ -445,6 +430,91 @@
       font-weight: 700;
       cursor: default;
       border-color: #bfdbfe;
+    }
+
+    /* ============ Фото (появляется после 21:50) ============ */
+
+    .photo-section { display: none; }
+    .photo-section.visible { display: block; }
+
+    .photo-block { margin-top: 0; }
+
+    .photo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: 1.5px dashed var(--border);
+      border-radius: 30px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, color .15s;
+      user-select: none;
+      width: 100%;
+      position: relative;
+    }
+
+    .photo-btn:hover {
+      border-color: var(--accent);
+      background: #eff6ff;
+      color: var(--accent);
+    }
+
+    .photo-btn input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .photo-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .photo-preview {
+      display: none;
+      position: relative;
+      margin-top: 12px;
+      border-radius: 30px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .photo-preview.visible { display: block; }
+
+    .photo-preview img {
+      display: block;
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      background: #f1f5f9;
+    }
+
+    .photo-remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.92);
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
     }
 
     /* ============ Админ-панель ============ */
@@ -467,14 +537,13 @@
       text-align: center;
       letter-spacing: 4px;
       background: #f8fafc;
-      transition: border-color .15s, box-shadow .15s, background .15s;
+      transition: border-color .15s, background .15s;
     }
 
     .admin-locked input:focus {
       outline: none;
       background: #fff;
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
 
     .admin-form { display: none; }
@@ -527,7 +596,7 @@
       color: var(--text);
       background: #f8fafc;
       resize: vertical;
-      transition: border-color .15s, box-shadow .15s, background .15s;
+      transition: border-color .15s, background .15s;
     }
 
     .admin-textarea:hover { background: #fff; }
@@ -536,7 +605,6 @@
       outline: none;
       background: #fff;
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
 
     .admin-label {
@@ -564,15 +632,12 @@
       font-weight: 700;
       letter-spacing: .3px;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-      transition: transform .06s, box-shadow .2s, opacity .2s;
+      transition: transform .06s, opacity .2s;
+      box-shadow: none;
     }
 
-    .actions button:hover:not(:disabled) {
-      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.45);
-    }
     .actions button:active:not(:disabled) { transform: translateY(1px); }
-    .actions button:disabled { opacity: .6; cursor: not-allowed; box-shadow: none; }
+    .actions button:disabled { opacity: .6; cursor: not-allowed; }
 
     .status {
       min-height: 1.3em;
@@ -621,9 +686,11 @@
 
       .slide-departments label { font-size: .8rem; padding: 8px 4px; }
 
-      .lock-logo { width: 84px; height: 84px; }
+      .lock-logo { width: 96px; height: 96px; }
 
-      .warning-banner { font-size: .85rem; padding: 12px 14px; }
+      .lock-warning { font-size: .85rem; padding: 12px 14px; top: 14px; }
+
+      .lock-screen { padding-top: 120px; }
     }
   </style>
 </head>
@@ -631,6 +698,11 @@
 
 <!-- ============ ЭКРАН БЛОКИРОВКИ ============ -->
 <div class="lock-screen" id="lockScreen">
+
+  <div class="lock-warning">
+    Если возникли проблемы с отправкой отчета обращаться к Сайфулле
+  </div>
+
   <div class="lock-card">
     <img class="lock-logo"
          src="https://i.postimg.cc/j5VZ62Hn/i-OSTelegram-Ag-AD1Jw-AAtxd-IEs.png"
@@ -641,7 +713,6 @@
     <div class="lock-error" id="pageLockError" role="alert"></div>
   </div>
 
-  <!-- Слайдер «Отдел открыт» внизу -->
   <div class="slide-bottom">
     <div class="slide-departments" role="radiogroup" aria-label="Какой отдел открыт">
       <label>
@@ -649,16 +720,16 @@
         Машинки
       </label>
       <label>
-        <input type="radio" name="openDept" value="vata">
+        <input type="radio" name="openDept" value="vata" checked>
         Вата
       </label>
       <label>
-        <input type="radio" name="openDept" value="both" checked>
+        <input type="radio" name="openDept" value="both">
         Оба
       </label>
     </div>
 
-    <p class="slide-caption" id="slideCaption">Сдвиньте, чтобы сообщить: Оба отдела — открыт</p>
+    <p class="slide-caption" id="slideCaption">Сдвиньте, чтобы сообщить: Вата — открыт</p>
     <div class="slide-track" id="slideTrack">
       <div class="slide-fill" id="slideFill"></div>
       <div class="slide-text" id="slideLabel">Отдел открыт</div>
@@ -683,13 +754,28 @@
 
 <form id="reportForm" class="report" novalidate>
 
-  <!-- Красная пометка -->
-  <div class="warning-banner">
-    Если возникли проблемы с отправкой отчета — обращаться к Сайфулле
-  </div>
-
   <!-- ==== МАШИНКИ ==== -->
   <div class="panel active" id="panel-machines" role="tabpanel" aria-labelledby="tab-machines">
+
+    <!-- Фото — сверху, включается после 21:50 -->
+    <fieldset class="section photo-section" id="photoSectionMachines">
+      <legend>Фото к отчёту</legend>
+      <div class="photo-block">
+        <label class="photo-btn">
+          <input type="file" accept="image/*" capture="environment" id="photoInputMachines">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 7h3l2-3h6l2 3h3v12H4V7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="12" cy="13" r="3.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span id="photoLabelMachines">Прикрепить фото отчёта</span>
+        </label>
+        <div class="photo-preview" id="photoPreviewMachines">
+          <img id="photoImgMachines" alt="Превью фото">
+          <button type="button" class="photo-remove" id="photoRemoveMachines" aria-label="Удалить фото">×</button>
+        </div>
+      </div>
+    </fieldset>
+
     <fieldset class="section">
       <legend>Основной отчёт</legend>
 
@@ -777,6 +863,26 @@
 
   <!-- ==== ВАТА ==== -->
   <div class="panel" id="panel-vata" role="tabpanel" aria-labelledby="tab-vata">
+
+    <!-- Фото — сверху, включается после 21:50 -->
+    <fieldset class="section photo-section" id="photoSectionVata">
+      <legend>Фото к отчёту</legend>
+      <div class="photo-block">
+        <label class="photo-btn">
+          <input type="file" accept="image/*" capture="environment" id="photoInputVata">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 7h3l2-3h6l2 3h3v12H4V7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="12" cy="13" r="3.5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span id="photoLabelVata">Прикрепить фото отчёта</span>
+        </label>
+        <div class="photo-preview" id="photoPreviewVata">
+          <img id="photoImgVata" alt="Превью фото">
+          <button type="button" class="photo-remove" id="photoRemoveVata" aria-label="Удалить фото">×</button>
+        </div>
+      </div>
+    </fieldset>
+
     <fieldset class="section">
       <legend>Вата</legend>
 
@@ -856,7 +962,9 @@
   const ADMIN_PASSWORD = '1972';
 
   /* --- Telegram --- */
-  const TELEGRAM_URL = 'https://api.telegram.org/bot8989222195:AAGSigzk7XbStPSrxp9RhWwdfG3kqpdMj7Q/sendMessage';
+  const BOT_TOKEN = '8989222195:AAGSigzk7XbStPSrxp9RhWwdfG3kqpdMj7Q';
+  const TELEGRAM_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  const TELEGRAM_PHOTO_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
   const CHAT_ID_MACHINES = '-5081784447';
   const CHAT_ID_VATA = '-5096610552';
 
@@ -874,6 +982,46 @@
     return data;
   }
 
+  async function sendPhotoToTelegram(chatId, file, caption) {
+    const fd = new FormData();
+    fd.append('chat_id', chatId);
+    fd.append('photo', file, file.name || 'photo.jpg');
+    fd.append('caption', caption.length > 1024 ? caption.slice(0, 1021) + '...' : caption);
+    const response = await fetch(TELEGRAM_PHOTO_URL, {
+      method: 'POST',
+      body: fd
+    });
+    let data = null;
+    try { data = await response.json(); } catch (_) {}
+    if (!response.ok || !data || data.ok !== true) {
+      throw new Error((data && data.description) || `HTTP ${response.status}`);
+    }
+    return data;
+  }
+
+  async function sendReport(chatId, text, file) {
+    if (file) return sendPhotoToTelegram(chatId, file, text);
+    return sendToTelegram(chatId, text);
+  }
+
+  /* ==================== ПРОВЕРКА ВРЕМЕНИ (после 21:50) ==================== */
+
+  const PHOTO_HOUR = 21;
+  const PHOTO_MINUTE = 50;
+
+  function isPhotoTime() {
+    const now = new Date();
+    const hh = now.getHours();
+    const mm = now.getMinutes();
+    return (hh > PHOTO_HOUR) || (hh === PHOTO_HOUR && mm >= PHOTO_MINUTE);
+  }
+
+  function updatePhotoVisibility() {
+    const visible = isPhotoTime();
+    $('photoSectionMachines').classList.toggle('visible', visible);
+    $('photoSectionVata').classList.toggle('visible', visible);
+  }
+
   /* ==================== СЛАЙДЕР «ОТДЕЛ ОТКРЫТ» ==================== */
 
   const track = $('slideTrack');
@@ -889,7 +1037,7 @@
 
   function getSelectedDept() {
     const checked = document.querySelector('input[name="openDept"]:checked');
-    return checked ? checked.value : 'both';
+    return checked ? checked.value : 'vata';
   }
 
   function deptLabel(value) {
@@ -1007,6 +1155,7 @@
       mainContent.style.display = 'block';
       pageLockError.textContent = '';
       refreshTimes();
+      updatePhotoVisibility();
     } else if (value.length === 4) {
       pageLockError.textContent = 'Неверный пароль';
       pagePasswordInput.value = '';
@@ -1067,6 +1216,8 @@
       if (document.activeElement === input) return;
       input.value = getCurrentTimeHHMM();
     });
+    // Заодно проверяем доступность фото
+    updatePhotoVisibility();
   }
 
   refreshTimes();
@@ -1103,6 +1254,43 @@
   const setMachinesStatus = makeStatusSetter($('statusMachines'));
   const setVataStatus = makeStatusSetter($('statusVata'));
   const setAdminStatus = makeStatusSetter($('statusAdmin'));
+
+  /* ==================== ФОТО ==================== */
+
+  const photos = {
+    machines: { file: null, preview: $('photoPreviewMachines'), img: $('photoImgMachines'),
+                input: $('photoInputMachines'), label: $('photoLabelMachines'),
+                remove: $('photoRemoveMachines') },
+    vata:     { file: null, preview: $('photoPreviewVata'), img: $('photoImgVata'),
+                input: $('photoInputVata'), label: $('photoLabelVata'),
+                remove: $('photoRemoveVata') }
+  };
+
+  function resetPhoto(key) {
+    const p = photos[key];
+    p.file = null;
+    p.input.value = '';
+    p.preview.classList.remove('visible');
+    p.img.removeAttribute('src');
+    p.label.textContent = 'Прикрепить фото отчёта';
+  }
+
+  Object.entries(photos).forEach(([key, p]) => {
+    p.input.addEventListener('change', () => {
+      const file = p.input.files && p.input.files[0];
+      if (!file) { resetPhoto(key); return; }
+      if (!file.type.startsWith('image/')) {
+        p.input.value = '';
+        return;
+      }
+      p.file = file;
+      const url = URL.createObjectURL(file);
+      p.img.src = url;
+      p.preview.classList.add('visible');
+      p.label.textContent = 'Заменить фото';
+    });
+    p.remove.addEventListener('click', () => resetPhoto(key));
+  });
 
   /* --- Тексты отчётов --- */
   function buildMachinesText() {
@@ -1144,8 +1332,10 @@
     btn.disabled = true;
     setMachinesStatus('Отправка отчёта…', 'pending');
     try {
-      await sendToTelegram(CHAT_ID_MACHINES, buildMachinesText());
+      const file = isPhotoTime() ? photos.machines.file : null;
+      await sendReport(CHAT_ID_MACHINES, buildMachinesText(), file);
       setMachinesStatus('Отчёт отправлен', 'ok');
+      if (file) resetPhoto('machines');
     } catch (e) {
       setMachinesStatus('Ошибка отправки: ' + e.message, 'err');
     } finally {
@@ -1160,8 +1350,10 @@
     btn.disabled = true;
     setVataStatus('Отправка отчёта…', 'pending');
     try {
-      await sendToTelegram(CHAT_ID_VATA, buildVataText());
+      const file = isPhotoTime() ? photos.vata.file : null;
+      await sendReport(CHAT_ID_VATA, buildVataText(), file);
       setVataStatus('Отчёт отправлен', 'ok');
+      if (file) resetPhoto('vata');
     } catch (e) {
       setVataStatus('Ошибка отправки: ' + e.message, 'err');
     } finally {
@@ -1237,6 +1429,9 @@
   }
 
   $('adminSendBtn').addEventListener('click', handleAdminSend);
+
+  /* --- Первичная проверка при загрузке --- */
+  updatePhotoVisibility();
 
 </script>
 
