@@ -157,7 +157,7 @@
       font-weight: 600;
     }
 
-    /* ============ Слайдер «Отдел открыт» ============ */
+    /* ============ Слайдер ============ */
 
     .slide-bottom {
       position: fixed;
@@ -368,8 +368,6 @@
       color: var(--text);
     }
 
-    /* ============ Панель с кнопкой внизу ============ */
-
     .section.action-bar {
       position: fixed;
       left: 50%;
@@ -384,8 +382,6 @@
       border: 1px solid var(--border);
       border-radius: 30px;
     }
-
-    /* ============ Строка ============ */
 
     .row {
       display: flex;
@@ -435,6 +431,13 @@
       font-weight: 700;
       cursor: default;
       border-color: #bfdbfe;
+    }
+
+    .row input.auto-filled {
+      background: #ecfdf5;
+      color: #065f46;
+      font-weight: 700;
+      border-color: #a7f3d0;
     }
 
     /* ============ Фото ============ */
@@ -522,7 +525,7 @@
       line-height: 1;
     }
 
-    /* ============ Админ-панель ============ */
+    /* ============ Админ ============ */
 
     .admin-locked {
       display: flex;
@@ -658,7 +661,7 @@
     .status.err { color: var(--danger); }
     .status.pending { color: var(--muted); }
 
-    /* ============ Плашка «восстановлены» ============ */
+    /* ============ Тост ============ */
 
     .restore-toast {
       position: fixed;
@@ -700,14 +703,8 @@
         padding: 12px 14px 8px;
       }
 
-      .row {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-      }
-
+      .row { flex-direction: row; align-items: center; gap: 10px; }
       .row label { font-size: .9rem; }
-
       .row input {
         flex: 0 0 var(--input-width);
         width: var(--input-width);
@@ -716,15 +713,10 @@
       }
 
       .tabs button { padding: 10px 8px; font-size: .85rem; }
-
       .slide-bottom { max-width: 100%; bottom: 30px; }
-
       .slide-departments label { font-size: .8rem; padding: 8px 4px; }
-
       .lock-logo { width: 115px; height: 115px; }
-
       .lock-warning { font-size: .85rem; padding: 12px 14px; top: 14px; }
-
       .lock-screen { padding-top: 120px; }
     }
   </style>
@@ -779,7 +771,6 @@
   </div>
 </div>
 
-<!-- Плашка-уведомление о восстановлении -->
 <div class="restore-toast" id="restoreToast">↻ Восстановлены данные за сегодня</div>
 
 <!-- ============ ОСНОВНОЙ КОНТЕНТ ============ -->
@@ -815,7 +806,7 @@
     </fieldset>
 
     <fieldset class="section">
-      <legend>Машинки</legend>
+      <legend>Основной отчёт</legend>
 
       <div class="row">
         <label for="time">На время</label>
@@ -1019,19 +1010,35 @@
   const LOGO_VATA = 'https://i.postimg.cc/3wK0pH6L/IMG-8690.png';
   const LOGO_BOTH = 'https://i.postimg.cc/j5VZ62Hn/i-OSTelegram-Ag-AD1Jw-AAtxd-IEs.png';
 
-  /* ==================== СОХРАНЕНИЕ ДАННЫХ НА ДЕНЬ ==================== */
+  /* ==================== ПОРОГ ВРЕМЕНИ ==================== */
+
+  // До 12:30 — период = клиентам, после 12:30 — разница
+  const PERIOD_THRESHOLD_HOUR = 12;
+  const PERIOD_THRESHOLD_MINUTE = 30;
+
+  function isBeforeThreshold(timeStr) {
+    if (!timeStr) return false;
+    const parts = timeStr.split(':');
+    const hh = parseInt(parts[0] || '0', 10);
+    const mm = parseInt(parts[1] || '0', 10);
+    if (hh < PERIOD_THRESHOLD_HOUR) return true;
+    if (hh === PERIOD_THRESHOLD_HOUR && mm < PERIOD_THRESHOLD_MINUTE) return true;
+    return false;
+  }
+
+  /* ==================== СОХРАНЕНИЕ ДАННЫХ ==================== */
 
   const STORAGE_KEY = 'reportApp.dailyData';
   const STORAGE_DATE_KEY = 'reportApp.savedDate';
+  const STORAGE_LAST_CLIENTS_KEY = 'reportApp.lastClients';
+  const STORAGE_LAST_CLIENTS_DATE_KEY = 'reportApp.lastClientsDate';
 
-  // Список полей, значения которых сохраняем
   const SAVED_FIELD_IDS = [
     'time', 'cash', 'cashless', 'promo', 'period', 'clients',
     'cartCash', 'cartCashless', 'cartPeriod', 'cartClients', 'raffle',
     'vataTime', 'vataCash', 'vataCashless', 'vataCups'
   ];
 
-  // Локальная дата в формате YYYY-MM-DD (не UTC!)
   function todayKey() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1046,15 +1053,13 @@
       });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       localStorage.setItem(STORAGE_DATE_KEY, todayKey());
-    } catch (_) { /* приватный режим / квота — игнорируем */ }
+    } catch (_) {}
   }
 
-  // Возвращает true, если удалось восстановить данные за сегодня
   function loadDailyData() {
     try {
       const savedDate = localStorage.getItem(STORAGE_DATE_KEY);
       if (savedDate !== todayKey()) {
-        // Данные устарели — очищаем
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(STORAGE_DATE_KEY);
         return false;
@@ -1071,24 +1076,30 @@
         }
       });
       return restored;
-    } catch (_) {
-      return false;
-    }
+    } catch (_) { return false; }
   }
 
-  // Очистить сохранённые данные (можно вызвать вручную)
-  function clearDailyData() {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(STORAGE_DATE_KEY);
-    } catch (_) {}
-  }
-
-  // Показать плашку «данные восстановлены»
   function showRestoreToast() {
     const t = $('restoreToast');
     t.classList.add('visible');
     setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
+  /* ==================== ПРЕДЫДУЩЕЕ ЗНАЧЕНИЕ КЛИЕНТОВ ==================== */
+
+  function getLastClients() {
+    try {
+      if (localStorage.getItem(STORAGE_LAST_CLIENTS_DATE_KEY) !== todayKey()) return null;
+      const v = localStorage.getItem(STORAGE_LAST_CLIENTS_KEY);
+      return v === null ? null : Number(v);
+    } catch (_) { return null; }
+  }
+
+  function setLastClients(value) {
+    try {
+      localStorage.setItem(STORAGE_LAST_CLIENTS_KEY, String(value));
+      localStorage.setItem(STORAGE_LAST_CLIENTS_DATE_KEY, todayKey());
+    } catch (_) {}
   }
 
   /* ==================== TELEGRAM API ==================== */
@@ -1280,7 +1291,6 @@
       pageLockError.textContent = '';
       refreshTimes();
 
-      // Восстанавливаем сохранённые данные за сегодня
       const restored = loadDailyData();
       if (restored) {
         updateMachinesTotals();
@@ -1362,7 +1372,6 @@
     });
     input.addEventListener('blur', () => {
       if (input.value.trim() === '') input.value = '0';
-      // Сохраняем после потери фокуса (значение точно установлено)
       saveDailyData();
     });
   });
@@ -1379,6 +1388,43 @@
   function updateVataTotal() {
     fields.vataTotal.value = toNumber(fields.vataCash.value) + toNumber(fields.vataCashless.value);
   }
+
+  /* ==================== АВТОПОДСЧЁТ «ОТКАТАЛИСЬ В ПЕРИОД» ==================== */
+
+  function recalcPeriodFromClients() {
+    const current = toNumber(fields.clients.value);
+    const timeStr = fields.time.value || '';
+
+    if (isBeforeThreshold(timeStr)) {
+      // До 12:30 — период = клиентам
+      fields.period.value = current;
+      fields.period.classList.add('auto-filled');
+    } else {
+      const last = getLastClients();
+      if (last !== null) {
+        const diff = current - last;
+        fields.period.value = diff >= 0 ? diff : 0;
+        fields.period.classList.add('auto-filled');
+      } else {
+        // Первый отчёт после 12:30 — оставляем как введено вручную
+        fields.period.classList.remove('auto-filled');
+      }
+    }
+  }
+
+  fields.clients.addEventListener('input', () => {
+    recalcPeriodFromClients();
+    saveDailyData();
+  });
+
+  fields.time.addEventListener('change', () => {
+    recalcPeriodFromClients();
+    saveDailyData();
+  });
+
+  fields.time.addEventListener('input', () => {
+    recalcPeriodFromClients();
+  });
 
   /* --- Статусы --- */
   const makeStatusSetter = (el) => (msg, kind) => {
@@ -1462,13 +1508,18 @@
   async function handleGenerateMachines() {
     fields.time.value = getCurrentTimeHHMM();
     updateMachinesTotals();
-    saveDailyData(); // сохраняем перед отправкой
+    recalcPeriodFromClients();
+    saveDailyData();
     const btn = $('generateMachines');
     btn.disabled = true;
     setMachinesStatus('Отправка отчёта…', 'pending');
     try {
       const file = isPhotoTime() ? photos.machines.file : null;
       await sendReport(CHAT_ID_MACHINES, buildMachinesText(), file);
+
+      // ← Запоминаем текущее значение клиентов для следующего отчёта
+      setLastClients(toNumber(fields.clients.value));
+
       setMachinesStatus('Отчёт отправлен', 'ok');
       if (file) resetPhoto('machines');
     } catch (e) {
@@ -1505,7 +1556,7 @@
     $(id).addEventListener('input', () => { updateMachinesTotals(); saveDailyData(); }));
   ['vataCash', 'vataCashless', 'vataCups'].forEach((id) =>
     $(id).addEventListener('input', () => { updateVataTotal(); saveDailyData(); }));
-  ['promo', 'period', 'clients', 'cartPeriod', 'cartClients', 'raffle'].forEach((id) =>
+  ['period', 'promo', 'cartPeriod', 'cartClients', 'raffle'].forEach((id) =>
     $(id).addEventListener('input', saveDailyData));
 
   updateMachinesTotals();
@@ -1566,10 +1617,6 @@
   /* --- Первичная проверка --- */
   updatePhotoVisibility();
 
-  /* --- Очистка данных при закрытии вкладки браузера в 00:00 нового дня --- */
-  // (просто проверка при загрузке — уже реализована в loadDailyData через дату)
-  // Дополнительно: если дата поменялась во время работы, при следующем сохранении
-  // старые данные заменятся.
   window.addEventListener('beforeunload', () => {
     saveDailyData();
   });
